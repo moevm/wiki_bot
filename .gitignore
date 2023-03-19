@@ -9,4 +9,6 @@ venv
 
 *.idea
 
+*.cpython-39
+
 __pycache__
