@@ -1,6 +1,6 @@
 import telebot
 from telebot import types
-from  config import token
+from config import token
 
 
 bot = telebot.TeleBot(token)
@@ -33,8 +33,7 @@ def callback_inline(call):
             bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
             # show alert
-            bot.answer_callback_query(callback_query_id=call.id, show_alert=False,
-                                      text="notification")
+            #bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="notification")
 
     except Exception as e:
         print(repr(e))

@@ -1,3 +1,4 @@
 venv
 .idea
-config.py
+telegram/config.py
+__pycache__
