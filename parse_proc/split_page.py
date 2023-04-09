@@ -71,8 +71,7 @@ def to_blocktext(html_text):
     return extracted_blocks_texts
 
 
-def main():
-    path_to_html = ''  # путь к странице html
+def main(path_to_html: str = ""): 
     if not path_to_html:
         print("Пропиши путь к файлу")
         return
@@ -80,6 +79,8 @@ def main():
         txt = f.read()
 
     list_of_blocks = to_blocktext(txt)
+    
+    return list_of_blocks
 
 
 if __name__ == "__main__":
