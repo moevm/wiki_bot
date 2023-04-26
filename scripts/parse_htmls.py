@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup, Tag
 import json
 import os
 import hashlib
+from bs4 import BeautifulSoup, Tag
 
 
 headers = {
@@ -17,6 +18,15 @@ def get_html(url: str) -> str:
     return req.text
 
 
+def clear_html(html: str):
+    soup = BeautifulSoup(html, "lxml")
+    page_content = soup.find_all("div", {"class": "page group"})[0]
+    toc = page_content.find("div", {"id": "dw__toc"})
+    if toc is not None:
+        toc.extract()
+    return str(page_content)
+
+
 def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_htmls: str):
     path_to_dir_with_htmls =  path_to_dir_with_htmls if path_to_dir_with_htmls.endswith("/") else f"{path_to_dir_with_htmls}/"
     manifest = json.load(open(links_manifest_path, "r"))
@@ -27,6 +37,9 @@ def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_h
 
     for item in manifest:
         html = get_html(item['url'])
+
+        if "se.moevm.info" in item["url"]:
+            html = clear_html(html)
         html_name = f"{item['num_course']}_{hashlib.md5(html.encode('utf-8')).hexdigest()}.html"
         path_to_save = f"{path_to_dir_with_htmls}{html_name}"
         
