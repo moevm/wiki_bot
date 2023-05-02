@@ -5,7 +5,7 @@
 
 Чтобы получить список всех ссылок с интересующими нас html-ками, надо запустить скрипт:
 ```
-python create_link_manifest.py --result-manifest_path=manifest_only_links.json
+python create_link_manifest.py --result-manifest-path=manifest_only_links.json
 ```
 
 Чтобы спарсить полученные html-ки надо запустить следующий скрипт:
