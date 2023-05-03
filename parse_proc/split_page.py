@@ -46,7 +46,7 @@ def sum_block_h(blocks, threshold):
 
 
 # функция, которая получает на вход страницу html и возвращает список блоков
-def to_blocktext(html_file, max_len_tensor):
+def to_blocktext(html_file: str, max_len_tensor: int = 512):
     if not html_file:
         print("Пропиши путь к файлу")
         return
