@@ -5,18 +5,18 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("cointegrated/LaBSE-en-ru")
 
-blocks = ["span", "li", "a", "p", "h1", "h2", "h3", "h4", "h5"]
+blocks = ["span", "li", "a", "p", "tr", "ol", "ul", "h1", "h2", "h3", "h4", "h5"]
 
 
-def _extract_blocks(parent_tag):
+def _extract_blocks(parent_tag, max_len):
     extracted_blocks = []
     for tag in parent_tag:
-        if tag.name in blocks:
+        if tag.name in blocks and len(tokenizer.encode(tag.get_text().strip())) <= max_len:
             extracted_blocks.append([tag, tag.name])
             continue
         if isinstance(tag, Tag):
             if len(tag.contents) > 0:
-                inner_blocks = _extract_blocks(tag)
+                inner_blocks = _extract_blocks(tag, max_len)
                 if len(inner_blocks) > 0:
                     extracted_blocks.extend(inner_blocks)
     return extracted_blocks
@@ -54,7 +54,7 @@ def to_blocktext(html_file, max_len_tensor):
         html_text = f.read()
 
     soup = BeautifulSoup(html_text, features="lxml")
-    extracted_blocks = _extract_blocks(soup.body)
+    extracted_blocks = _extract_blocks(soup.body, max_len_tensor)
 
     grouped_text = sum_block_h(extracted_blocks, max_len_tensor)
     extracted_blocks_texts = []
