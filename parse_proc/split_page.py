@@ -5,7 +5,7 @@ from transformers import AutoTokenizer
 
 tokenizer = AutoTokenizer.from_pretrained("cointegrated/LaBSE-en-ru")
 
-blocks = ["span", "li", "a", "tr", "p", "h1", "h2", "h3", "h4", "h5"]
+blocks = ["span", "li", "a", "p", "h1", "h2", "h3", "h4", "h5"]
 
 
 def _extract_blocks(parent_tag):
