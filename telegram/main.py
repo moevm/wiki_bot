@@ -4,9 +4,10 @@ from config import token
 from firebaseDataStore.main import DatabaseHelper
 
 
+
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
-data = dict.fromkeys(['question', 'answer'])
+data = {}
 
 @bot.message_handler(commands = ['start'])
 def start(message):
@@ -15,7 +16,7 @@ def start(message):
 
 @bot.message_handler(content_types = ['text'])
 def get_user_text(message):
-
+    data.clear()
     question = message.text
     clear_question = "".join(filter(lambda x: x == " " or x.isalnum(), question))
     markup = types.InlineKeyboardMarkup()
@@ -33,12 +34,14 @@ def callback_inline(call):
         if call.message:
             if call.data == 'good':
                 bot.send_message(call.message.chat.id, 'Вот и отличненько 😊')
-                helper.like(data)
-                data.clear()
+                if len(data.keys())==2:
+                    helper.like(data)
+                    data.clear()
             elif call.data == 'bad':
                 bot.send_message(call.message.chat.id, 'Бывает 😢')
-                helper.dislike(data)
-                data.clear()
+                if len(data.keys()) == 2:
+                    helper.dislike(data)
+                    data.clear()
             # remove inline buttons
             bot.edit_message_reply_markup(chat_id = call.message.chat.id, message_id = call.message.message_id)
 
