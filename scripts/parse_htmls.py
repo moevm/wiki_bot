@@ -58,7 +58,7 @@ def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_h
 
     new_manifest = parse_htmls(manifest, path_to_dir_with_htmls)
 
-    json.dump(new_manifest, open(result_manifest_path, 'w'), ensure_ascii=False, indent=4)
+    json.dump(new_manifest, open(result_manifest_path, 'w', encoding='utf8'), ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":

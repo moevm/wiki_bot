@@ -100,7 +100,7 @@ def create_link_manifest(start_url: str):
 def main(start_url: str, manifest_path: str):
     assert manifest_path.endswith(".json") 
     link_index = create_link_manifest(start_url)
-    json.dump(link_index, open(manifest_path, 'w'), ensure_ascii=False, indent=4)
+    json.dump(link_index, open(manifest_path, 'w', encoding='utf8'), ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
