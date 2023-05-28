@@ -27,15 +27,14 @@ def clear_html(html: str):
     return str(page_content)
 
 
-def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_htmls: str):
-    path_to_dir_with_htmls =  path_to_dir_with_htmls if path_to_dir_with_htmls.endswith("/") else f"{path_to_dir_with_htmls}/"
-    manifest = json.load(open(links_manifest_path, "r"))
-    new_manifest = []
+def parse_htmls(links_manifest, path_to_dir_with_htmls: str):
 
     if not os.path.exists(path_to_dir_with_htmls):
         os.makedirs(path_to_dir_with_htmls)
 
-    for item in manifest:
+    new_manifest = []
+
+    for item in links_manifest:
         html = get_html(item['url'])
 
         if "se.moevm.info" in item["url"]:
@@ -49,9 +48,17 @@ def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_h
 
         item['path_to_file'] = path_to_save
         new_manifest.append(item)
-    
-    json.dump(new_manifest, open(result_manifest_path, 'w'), ensure_ascii=False, indent=4)
 
+    return new_manifest
+
+
+def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_htmls: str):
+    path_to_dir_with_htmls = path_to_dir_with_htmls if path_to_dir_with_htmls.endswith("/") else f"{path_to_dir_with_htmls}/"
+    manifest = json.load(open(links_manifest_path, "r"))
+
+    new_manifest = parse_htmls(manifest, path_to_dir_with_htmls)
+
+    json.dump(new_manifest, open(result_manifest_path, 'w'), ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
