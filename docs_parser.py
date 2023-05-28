@@ -1,4 +1,5 @@
 import logging
+import json
 
 from scripts.create_link_manifest import create_link_manifest
 from scripts.parse_htmls import parse_htmls
@@ -10,7 +11,10 @@ logger = logging.getLogger(__name__)
 class DocsParser:
     def __init__(self, config):
         self.config = config
-        manifest = self._parse_data()
+        if self.config["use_preload_htmls"]:
+            manifest = json.load(open(self.config["preload_manifest"], "r"))
+        else:
+            manifest = self._parse_data()
         
         self.splitted_docs = {}
         for doc in manifest:

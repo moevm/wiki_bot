@@ -1,7 +1,7 @@
 dir_with_htmls: 
-path_to_link_manifest:
-path_to_docs_manifest:
-start_url: se.moevm.info
+start_url: https://se.moevm.info
 hf_model_name: ai-forever/sbert_large_nlu_ru
 device: cuda
 rubbish_threshold: 0.5
+use_preload_htmls: True
+preload_manifest: 
