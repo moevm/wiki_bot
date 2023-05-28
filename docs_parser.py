@@ -12,7 +12,7 @@ class DocsParser:
     def __init__(self, config):
         self.config = config
         if self.config["use_preload_htmls"]:
-            manifest = json.load(open(self.config["preload_manifest"], "r"))
+            manifest = json.load(open(self.config["preload_manifest"], "r", encoding="utf-8"))
         else:
             manifest = self._parse_data()
         

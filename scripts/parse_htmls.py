@@ -54,7 +54,7 @@ def parse_htmls(links_manifest, path_to_dir_with_htmls: str):
 
 def main(links_manifest_path: str, result_manifest_path: str, path_to_dir_with_htmls: str):
     path_to_dir_with_htmls = path_to_dir_with_htmls if path_to_dir_with_htmls.endswith("/") else f"{path_to_dir_with_htmls}/"
-    manifest = json.load(open(links_manifest_path, "r"))
+    manifest = json.load(open(links_manifest_path, "r", encoding="utf-8"))
 
     new_manifest = parse_htmls(manifest, path_to_dir_with_htmls)
 
