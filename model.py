@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from docs_parser import DocsParser
 from hyperpyyaml import load_hyperpyyaml
 import logging
+from tqdm import tqdm
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ class AnsweringModel:
         for key in unique_keys:
             self.spaces[key] = []
 
-        for doc in splitted_docs:
+        for doc in tqdm(splitted_docs):
             encoded_input = self.tokenizer(splitted_docs[doc]["text_samples"], padding=True, 
                                            truncation=True, max_length=512, return_tensors='pt').to(self.model.device)
 
