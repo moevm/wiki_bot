@@ -31,7 +31,7 @@ class AnsweringModel:
         self.spaces = {}
         unique_keys = list(set([splitted_docs[i]['num_course'] for i in splitted_docs]))
         for key in unique_keys:
-            self.spaces = [key]
+            self.spaces[key] = []
 
         for doc in splitted_docs:
             encoded_input = self.tokenizer(splitted_docs[doc]["text_samples"], padding=True, 
