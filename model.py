@@ -21,6 +21,7 @@ class AnsweringModel:
         self.tokenizer = AutoTokenizer.from_pretrained(self.config["hf_model_name"]) 
         self.model = AutoModelForPreTraining.from_pretrained(self.config["hf_model_name"])
         self.model = self.model.to(self.config["device"]) 
+        self.build_vector_spaces()
     
     def build_vector_spaces(self):
         
@@ -28,12 +29,13 @@ class AnsweringModel:
         splitted_docs = parser.get_docs()
 
         self.spaces = {}
-        unique_keys = list(set([i['num_course'] for i in splitted_docs]))
+        unique_keys = list(set([splitted_docs[i]['num_course'] for i in splitted_docs]))
         for key in unique_keys:
             self.spaces = [key]
 
         for doc in splitted_docs:
-            encoded_input = self.tokenizer(doc["text_samples"], padding=True, truncation=True, max_length=512, return_tensors='pt').to(model.device)
+            encoded_input = self.tokenizer(splitted_docs[doc]["text_samples"], padding=True, 
+                                           truncation=True, max_length=512, return_tensors='pt').to(self.model.device)
 
             #Compute token embeddings
             with torch.no_grad():
@@ -42,8 +44,8 @@ class AnsweringModel:
             sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
             sentence_embeddings = torch.mean(sentence_embeddings, axis=0)
 
-            self.spaces[doc["num_course"]].append({
-                "url": doc["url"],
+            self.spaces[splitted_docs[doc]["num_course"]].append({
+                "url": doc,
                 "emb": sentence_embeddings
                 })
             
