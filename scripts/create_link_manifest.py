@@ -83,8 +83,7 @@ def parse_links_from_url(url: str, num_course: int, subject_name: str):
     return result
 
 
-def main(start_url: str, manifest_path: str):
-    assert manifest_path.endswith(".json") 
+def create_link_manifest(start_url: str):
 
     link_index = []
     list_of_subjects = parse_subjects(start_url)
@@ -94,8 +93,14 @@ def main(start_url: str, manifest_path: str):
         link_index.extend(
             parse_links_from_url(subject['url'], subject['num_course'], subject['subject'])
             )
-        
-    json.dump(link_index, open(manifest_path, 'w'), ensure_ascii=False, indent=4)
+    
+    return link_index
+
+
+def main(start_url: str, manifest_path: str):
+    assert manifest_path.endswith(".json") 
+    link_index = create_link_manifest(start_url)
+    json.dump(link_index, open(manifest_path, 'w', encoding='utf8'), ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":

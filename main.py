@@ -2,12 +2,20 @@ import telebot
 from telebot import types
 from config import token
 from firebaseDataStore.main import DatabaseHelper
+from model import AnsweringModel
+import logging
 
 
-
+logger = logging.getLogger('logger')
+logger.setLevel(logging.DEBUG)
+stream = logging.StreamHandler()
+stream.setLevel(logging.INFO)
+logger.addHandler(stream)
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
 data = {}
+model = AnsweringModel("config.yaml") 
+
 
 @bot.message_handler(commands = ['start'])
 def start(message):
