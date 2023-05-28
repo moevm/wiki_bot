@@ -3,6 +3,10 @@ import torch
 import torch.nn.functional as F
 from docs_parser import DocsParser
 from hyperpyyaml import load_hyperpyyaml
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def mean_pooling(model_output, attention_mask):
@@ -21,7 +25,9 @@ class AnsweringModel:
         self.tokenizer = AutoTokenizer.from_pretrained(self.config["hf_model_name"]) 
         self.model = AutoModelForPreTraining.from_pretrained(self.config["hf_model_name"])
         self.model = self.model.to(self.config["device"]) 
+        logger.info("start build vectorize")
         self.build_vector_spaces()
+        logger.info("finish build vectorize")
     
     def build_vector_spaces(self):
         
