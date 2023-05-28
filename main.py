@@ -3,6 +3,7 @@ from telebot import types
 from config import token
 from firebaseDataStore.main import DatabaseHelper
 from model import AnsweringModel
+import logging
 
 
 
@@ -10,6 +11,7 @@ bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
 data = {}
 model = AnsweringModel("config.yaml") 
+logger = logging.getLogger('logger')
 
 @bot.message_handler(commands = ['start'])
 def start(message):
