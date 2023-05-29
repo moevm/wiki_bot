@@ -7,10 +7,8 @@ import logging
 
 
 logger = logging.getLogger('logger')
-logger.setLevel(logging.DEBUG)
-stream = logging.StreamHandler()
-stream.setLevel(logging.INFO)
-logger.addHandler(stream)
+logging.basicConfig(level=logging.INFO)
+
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
 data = {}
