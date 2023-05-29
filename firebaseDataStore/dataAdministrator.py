@@ -12,6 +12,12 @@ class DataAdministrator:
     def delUserInfo(self, _id):
         self.data[_id].clear()
 
+    def yearForCurrentId(self, _id):
+        try:
+            return self.data[_id]["year"]
+        except:
+            return 0
+
     def checkIfPossibleForReaction(self, _id):
         l = list(self.data[_id].keys())
         return True if l.count('question')!=0 and l.count('answer')!=0 else False

@@ -54,7 +54,7 @@ def get_user_text(message):
     logger.info("get_message")
     _id = message.from_user.id
     dataAdmin.addUser(_id)
-    if year == 0:
+    if dataAdmin.yearForCurrentId(_id) == 0:
         bot.send_message(message.chat.id, "Вы не выбрали курс!")
     else:
         dataAdmin.delUserInfo(message.from_user.id)
@@ -76,7 +76,7 @@ def get_user_text(message):
 def callback_inline(call):
     global year
     if call.message:
-        _id = call.message.message_id
+        _id = call.from_user.id
         if call.data == 'good':
             bot.send_message(call.message.chat.id, 'Вот и отличненько 😊\nМожете начать сначала: /start')
             if dataAdmin.checkIfPossibleForReaction(_id):
