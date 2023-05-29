@@ -10,7 +10,10 @@ class DataAdministrator:
         self.data[_id][key] = value
 
     def delUserInfo(self, _id):
-        self.data[_id].clear()
+        try:
+            self.data[_id].clear()
+        except:
+            print("No such user")
 
     def yearForCurrentId(self, _id):
         try:
