@@ -1,7 +1,7 @@
-dir_with_htmls: 
+dir_with_htmls: C:\Users\kotov\Documents\GitHub\wiki_bot\htmls\
 start_url: https://se.moevm.info
 hf_model_name: ai-forever/sbert_large_nlu_ru
-device: cuda
+device: cpu
 rubbish_threshold: 0.5
 use_preload_htmls: True
-preload_manifest: 
+preload_manifest: C:\Users\kotov\Documents\GitHub\wiki_bot\scripts\result.json
