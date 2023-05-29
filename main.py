@@ -22,7 +22,7 @@ dataAdmin = DataAdministrator()
 @bot.message_handler(commands=['start'])
 def start(message):
     logger.info(message.from_user.id)
-
+    dataAdmin.addUser(message.from_user.id)
     markup_year = types.InlineKeyboardMarkup()
     one = types.InlineKeyboardButton('1️⃣', callback_data='1')
     two = types.InlineKeyboardButton('2️⃣', callback_data='2')
@@ -89,6 +89,7 @@ def callback_inline(call):
                 dataAdmin.delUserInfo(_id)
         else:
             year = int(call.data)
+            dataAdmin.addUser(_id)
             dataAdmin.addInfo(_id, 'year', year)
             logger.info(f'номер курса {year}')
             bot.send_message(call.message.chat.id,
