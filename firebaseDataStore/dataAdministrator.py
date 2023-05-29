@@ -3,7 +3,7 @@ class DataAdministrator:
         self.data = {}
 
     def addUser(self, _id):
-        if len(list(self.data[_id].keys()))==0:
+        if list(self.data.keys()).count(_id)==0:
             self.data[_id] = {}
 
     def addInfo(self, _id, key, value):
