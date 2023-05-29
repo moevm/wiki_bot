@@ -3,6 +3,7 @@ from telebot import types
 from config import token
 from firebaseDataStore.main import DatabaseHelper
 from model import AnsweringModel
+from firebaseDataStore.dataAdministrator import DataAdministrator
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,15 +11,18 @@ logging.basicConfig(level=logging.INFO)
 
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
-data = {}
+
 year = 0
 
-#model = AnsweringModel("config.yaml")
+# model = AnsweringModel("config.yaml")
+
+dataAdmin = DataAdministrator()
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
     logger.info(message.from_user.id)
+
     markup_year = types.InlineKeyboardMarkup()
     one = types.InlineKeyboardButton('1️⃣', callback_data='1')
     two = types.InlineKeyboardButton('2️⃣', callback_data='2')
@@ -48,10 +52,12 @@ def start(message):
 @bot.message_handler(content_types=['text'])
 def get_user_text(message):
     logger.info("get_message")
+    _id = message.from_user.id
+    dataAdmin.addUser(_id)
     if year == 0:
         bot.send_message(message.chat.id, "Вы не выбрали курс!")
     else:
-        data.clear()
+        dataAdmin.delUserInfo(message.from_user.id)
         question = message.text
         clear_question = "".join(filter(lambda x: x == " " or x.isalnum(), question))
         markup = types.InlineKeyboardMarkup()
@@ -59,34 +65,36 @@ def get_user_text(message):
         dislike = types.InlineKeyboardButton('DISLIKE👎', callback_data='bad')
         markup.add(like, dislike)
         logger.info(f'номер курса {year}')
-        #answer = model.get_answer(clear_question, year, 'subject')
+        # answer = model.get_answer(clear_question, year, 'subject')
         answer = "ANSWER"
-        data['question'] = clear_question
-        data['answer'] = answer
+        dataAdmin.addInfo(_id, 'question', clear_question)
+        dataAdmin.addInfo(_id, 'answer', answer)
         bot.send_message(message.chat.id, answer, reply_markup=markup)
+
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     global year
     if call.message:
+        _id = call.message.message_id
         if call.data == 'good':
             bot.send_message(call.message.chat.id, 'Вот и отличненько 😊\nМожете начать сначала: /start')
-            if len(data.keys()) == 2:
-                helper.like(data)
-                data.clear()
+            if dataAdmin.checkIfPossibleForReaction(_id):
+                helper.like(dataAdmin.getDataForUser(_id))
+                dataAdmin.delUserInfo(_id)
         elif call.data == 'bad':
             bot.send_message(call.message.chat.id, 'Бывает 😢\nМожете начать сначала: /start')
-            if len(data.keys()) == 2:
-                helper.dislike(data)
-                data.clear()
+            if dataAdmin.checkIfPossibleForReaction(_id):
+                helper.dislike(dataAdmin.getDataForUser(_id))
+                dataAdmin.delUserInfo(_id)
         else:
             year = int(call.data)
+            dataAdmin.addInfo(_id, 'year', year)
             logger.info(f'номер курса {year}')
             bot.send_message(call.message.chat.id,
                              'Теперь можете задать вопрос\nИли можете начать сначала: /start')
         # remove inline buttons
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.message_id)
-
 
 
 bot.polling(non_stop=True)
