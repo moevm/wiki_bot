@@ -26,13 +26,14 @@ class AnsweringModel:
         self.build_vector_spaces()
         logger.info("finish build vectorize")
 
+
     def build_vector_spaces(self):
 
         parser = DocsParser(self.config)
         splitted_docs = parser.get_docs()
 
         self.spaces = {}
-        unique_keys = list(set([splitted_docs[i]['num_course'] for i in splitted_docs]))
+        unique_keys = list(set([(splitted_docs[i]['num_course'], splitted_docs[i]['subject']) for i in splitted_docs]))
         for key in unique_keys:
             self.spaces[key] = []
 
@@ -47,10 +48,11 @@ class AnsweringModel:
             sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
             sentence_embeddings = torch.mean(sentence_embeddings, axis=0)
 
-            self.spaces[splitted_docs[doc]["num_course"]].append({
+            self.spaces[(splitted_docs[doc]["num_course"], splitted_docs[doc]['subject'])].append({
                 "url": doc,
                 "emb": sentence_embeddings
             })
+
 
     def get_answer(self, question: str, num_course: int, subject: str):
         encoded_input = self.tokenizer([question], padding=True, truncation=True,
@@ -63,7 +65,7 @@ class AnsweringModel:
         question_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
         question_embeddings = torch.mean(question_embeddings, axis=0)
 
-        key = num_course
+        key = (num_course, subject)
         vector_space = self.spaces[key]
         max_cos_sim = -1
         doc_link = ""
