@@ -5,13 +5,16 @@ from firebaseDataStore.main import DatabaseHelper
 from model import AnsweringModel
 from firebaseDataStore.dataAdministrator import DataAdministrator
 import logging
+import argparse
+from hyperpyyaml import load_hyperpyyaml
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
-
+config = None
 year = 0
 
 # model = AnsweringModel("config.yaml")
@@ -97,5 +100,16 @@ def callback_inline(call):
         # remove inline buttons
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, message_id=call.message.message_id)
 
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', type=str, required=True)
+
+    args = parser.parse_args()
+
+    with open(args.config) as f:
+        config_yaml = f.read()
+    config = load_hyperpyyaml(config_yaml)
+    
 
 bot.polling(non_stop=True)

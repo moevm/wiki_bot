@@ -2,7 +2,6 @@ from transformers import AutoTokenizer, AutoModelForPreTraining
 import torch
 import torch.nn.functional as F
 from docs_parser import DocsParser
-from hyperpyyaml import load_hyperpyyaml
 import logging
 from tqdm import tqdm
 
@@ -18,10 +17,8 @@ def mean_pooling(model_output, attention_mask):
 
 class AnsweringModel:
 
-    def __init__(self, path_to_config):
-        with open(path_to_config) as fin:
-            self.config = load_hyperpyyaml(fin)
-
+    def __init__(self, config):
+        self.config = config
         self.tokenizer = AutoTokenizer.from_pretrained(self.config["hf_model_name"])
         self.model = AutoModelForPreTraining.from_pretrained(self.config["hf_model_name"])
         self.model = self.model.to(self.config["device"])
