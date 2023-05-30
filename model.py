@@ -4,11 +4,22 @@ import torch.nn.functional as F
 from docs_parser import DocsParser
 import logging
 from tqdm import tqdm
+from typing import Dict
+
 
 logger = logging.getLogger(__name__)
 
 
-def mean_pooling(model_output, attention_mask):
+def mean_pooling(model_output: torch.Tensor, attention_mask: torch.Tensor):
+    """Function for mean polling. 
+    After model inference your have vector for every token, but we need emb for sentence.
+    To solve this, we average token-level emb to one sentence-level emb
+
+    Parameters:
+        model_output: Tensor with shape (batch_size, cnt_tokens, emb_dim), assume it is model last_hidden_state
+        attention_mask: Tensor with shape (batch_size, cnt_tokens, emb_dim), attention_mask for vectorized texts
+    """
+
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(model_output.size()).float()
     sum_embeddings = torch.sum(model_output * input_mask_expanded, 1)
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
@@ -16,8 +27,13 @@ def mean_pooling(model_output, attention_mask):
 
 
 class AnsweringModel:
+    """Class for answering model
 
-    def __init__(self, config):
+    Attributes:
+        config: Config for all app, using for specify model name, device type
+    """
+
+    def __init__(self, config: Dict):
         self.config = config
         self.tokenizer = AutoTokenizer.from_pretrained(self.config["hf_model_name"])
         self.model = AutoModelForPreTraining.from_pretrained(self.config["hf_model_name"])
@@ -28,6 +44,9 @@ class AnsweringModel:
 
 
     def build_vector_spaces(self):
+        """Method, which build vector spaces per every combination (num_course, subject_name).
+        Vector spacec using for semantic search(in get_answer), to get nearest docs to user question
+        """
 
         parser = DocsParser(self.config)
         splitted_docs = parser.get_docs()
@@ -55,6 +74,12 @@ class AnsweringModel:
 
 
     def get_answer(self, question: str, num_course: int, subject: str):
+        """Method for semantic search nearest to user question doc
+
+        Parameters:
+            question: Text of user question
+        """
+
         encoded_input = self.tokenizer([question], padding=True, truncation=True,
                                        max_length=512, return_tensors='pt').to(self.model.device)
 

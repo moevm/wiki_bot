@@ -9,6 +9,14 @@ logger = logging.getLogger(__name__)
 
 
 class DocsParser:
+    """Class for docs parsing.
+    Assume, using for parse se.moevm.info.
+    It`s just wrapper over parsing functions from scripts.
+
+    Attributes:
+        config: Config for all app, using for specify url, or preload data for debug mode
+    """
+    
     def __init__(self, config):
         self.config = config
         if self.config["use_preload_htmls"]:
