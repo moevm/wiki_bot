@@ -12,6 +12,7 @@ class DocsParser:
     def __init__(self, config):
         self.config = config
         if self.config["use_preload_htmls"]:
+            logger.info(f"using preload htmls with manifest {self.config['preload_manifest']}")
             manifest = json.load(open(self.config["preload_manifest"], "r", encoding="utf-8"))
         else:
             manifest = self._parse_data()
@@ -28,9 +29,11 @@ class DocsParser:
     def _parse_data(self):
         logger.info(f'start parsing structure with base url = {self.config["start_url"]}')
         links_manifest = create_link_manifest(self.config["start_url"])
+        logger.info("finish parsing structure")
 
         logger.info(f'start parsing htmls, saving to dir {self.config["dir_with_htmls"]}')
         manifest = parse_htmls(links_manifest, self.config["dir_with_htmls"])
+        logger.info("finish parsing htmls")
 
         return manifest
     

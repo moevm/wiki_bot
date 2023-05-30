@@ -10,7 +10,11 @@ from hyperpyyaml import load_hyperpyyaml
 
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
 bot = telebot.TeleBot(token)
 helper = DatabaseHelper()
@@ -110,6 +114,6 @@ if __name__ == "__main__":
     with open(args.config) as f:
         config_yaml = f.read()
     config = load_hyperpyyaml(config_yaml)
-    
+
 
 bot.polling(non_stop=True)

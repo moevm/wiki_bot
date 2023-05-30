@@ -22,9 +22,9 @@ class AnsweringModel:
         self.tokenizer = AutoTokenizer.from_pretrained(self.config["hf_model_name"])
         self.model = AutoModelForPreTraining.from_pretrained(self.config["hf_model_name"])
         self.model = self.model.to(self.config["device"])
-        logger.info("start build vectorize")
+        logger.info("start build vector spaces")
         self.build_vector_spaces()
-        logger.info("finish build vectorize")
+        logger.info("finish build vector spaces")
 
 
     def build_vector_spaces(self):
@@ -74,7 +74,8 @@ class AnsweringModel:
 
             if sim > max_cos_sim:
                 max_cos_sim, doc_link = sim, doc["url"]
-
+        
+        logger.info(f"answer sim for question: {question}, sim = {sim}")
         if max_cos_sim > self.config["rubbish_threshold"]:
             return f"Попробуйте посмотреть здесь {doc_link}"
         else:
