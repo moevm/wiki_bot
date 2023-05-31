@@ -21,6 +21,12 @@ class DataAdministrator:
         except:
             return 0
 
+    def subjectForCurrentId(self, _id):
+        try:
+            return self.data[_id]["subject"]
+        except:
+            return 0
+
     def checkIfPossibleForReaction(self, _id):
         l = list(self.data[_id].keys())
         return True if l.count('question')!=0 and l.count('answer')!=0 else False
