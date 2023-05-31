@@ -10,6 +10,18 @@ import argparse
 from hyperpyyaml import load_hyperpyyaml
 import urllib3
 
+import sched, time
+
+class Links:
+    def __init__(self):
+        self.link_manifest = create_link_manifest("https://se.moevm.info")
+        self.s = sched.scheduler(time.time, time.sleep)
+
+    def update_link_manifest(self):
+        self.s.enter(60, 1, self.update_link_manifest())
+        self.link_manifest = create_link_manifest("https://se.moevm.info")
+        logger.info("SASAT'")
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logger = logging.getLogger(__name__)
@@ -34,7 +46,8 @@ if __name__ == "__main__":
 # model = AnsweringModel(config)
 
 dataAdmin = DataAdministrator()
-links_manifest = create_link_manifest("https://se.moevm.info")
+links_manifest = Links()
+links_manifest.s.run()
 logger.info("finish create_link_manifest")
 
 
@@ -68,7 +81,7 @@ def get_user_text(message):
 
     elif dataAdmin.subjectForCurrentId(_id) == 0:
         list_subjects = list(set(
-            [j["subject"] for j in links_manifest if j["num_course"] == dataAdmin.yearForCurrentId(_id)]))
+            [j["subject"] for j in links_manifest.link_manifest if j["num_course"] == dataAdmin.yearForCurrentId(_id)]))
 
         if message.text.isdigit() and 1 <= int(message.text) <= len(list_subjects):
             nub_subject = int(message.text) - 1
@@ -119,7 +132,7 @@ def callback_inline(call):
             dataAdmin.addUser(_id)
             dataAdmin.addInfo(_id, 'year', year)
             logger.info(f'номер курса {year}')
-            list_subjects = list(set([j["subject"] for j in links_manifest if j["num_course"] == year]))
+            list_subjects = list(set([j["subject"] for j in links_manifest.link_manifest if j["num_course"] == year]))
             numbered_list_subjects = []
             for i in range(len(list_subjects)):
                 numbered_list_subjects.append(str(i + 1) + ") " + list_subjects[i])
