@@ -16,11 +16,11 @@ class Links:
     def __init__(self):
         self.link_manifest = create_link_manifest("https://se.moevm.info")
         self.s = sched.scheduler(time.time, time.sleep)
+        self.s.enter(3000, 1, self.update_link_manifest)
 
     def update_link_manifest(self):
-        self.s.enter(60, 1, self.update_link_manifest())
         self.link_manifest = create_link_manifest("https://se.moevm.info")
-        logger.info("SASAT'")
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
