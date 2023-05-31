@@ -10,16 +10,16 @@ import argparse
 from hyperpyyaml import load_hyperpyyaml
 import urllib3
 
-import sched, time
+import threading, time
 
 class Links:
     def __init__(self):
         self.link_manifest = create_link_manifest("https://se.moevm.info")
-        self.s = sched.scheduler(time.time, time.sleep)
-        self.s.enter(3000, 1, self.update_link_manifest)
+        #self.update_link_manifest()
 
     def update_link_manifest(self):
         self.link_manifest = create_link_manifest("https://se.moevm.info")
+        threading.Timer(300, self.update_link_manifest()).start()
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -43,11 +43,10 @@ if __name__ == "__main__":
         config_yaml = f.read()
     config = load_hyperpyyaml(config_yaml)
 
-# model = AnsweringModel(config)
+model = AnsweringModel(config)
 
 dataAdmin = DataAdministrator()
 links_manifest = Links()
-links_manifest.s.run()
 logger.info("finish create_link_manifest")
 
 
@@ -103,8 +102,10 @@ def get_user_text(message):
         markup.add(like, dislike)
         logger.info(f'номер курса {dataAdmin.yearForCurrentId(_id)}')
         logger.info(dataAdmin.getDataForUser(_id))
-        answer = "ANSWER"
-        # answer = model.get_answer(clear_question, dataAdmin.yearForCurrentId(_id), dataAdmin.subjectForCurrentId(_id))
+        #answer = "ANSWER"
+        answer = model.get_answer(clear_question, dataAdmin.yearForCurrentId(_id), dataAdmin.subjectForCurrentId(_id))
+        logger.info("номер курса: "+ str(dataAdmin.yearForCurrentId(_id)))
+        logger.info("предмет: " + dataAdmin.subjectForCurrentId(_id))
         dataAdmin.addInfo(_id, 'question', clear_question)
         dataAdmin.addInfo(_id, 'answer', answer)
         bot.send_message(message.chat.id, answer, reply_markup=markup)
