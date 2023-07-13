@@ -1,0 +1,185 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+import os
+
+urls_1 = [
+    "https://se.moevm.info/doku.php/courses:programming:start",
+    "https://se.moevm.info/doku.php/courses:informatics:start"
+]
+
+urls_2 = [
+    "https://se.moevm.info/doku.php/courses:object_oriented_programming:start",
+    "https://se.moevm.info/doku.php/courses:algorithms_structures:start",
+    "https://se.moevm.info/doku.php/courses:algorithms_building_and_analysis:start"
+]
+
+urls_3 = [
+    "https://se.moevm.info/doku.php/courses:databases",
+    "https://se.moevm.info/doku.php/courses:mse:start",
+    "https://se.moevm.info/doku.php/courses:testing:start",
+    "https://se.moevm.info/doku.php/courses:artificial_neural_networks",
+    "https://se.moevm.info/doku.php/courses:knowledge_base_and_expert_system:start",
+    "https://se.moevm.info/doku.php/start:research_practice_3rd_course",
+    "https://se.moevm.info/doku.php/start:industrial_practice_3rd_course"
+]
+
+urls_4 = [
+    "https://se.moevm.info/doku.php/staff:courses:no_sql_introduction",
+    "https://se.moevm.info/doku.php/staff:courses:sci_writing",
+    "https://se.moevm.info/doku.php/courses:digital_signal_processing:start",
+    "https://se.moevm.info/doku.php/courses:ml",
+    "https://se.moevm.info/doku.php/courses:man_machine_interface:start",
+    "https://se.moevm.info/doku.php/courses:statistical_methods_of_experimental_data_handling:start",
+    "https://se.moevm.info/doku.php/staff:courses:application_development_for_mobile_platforms",
+    "https://se.moevm.info/doku.php/diplomants:start:diploma_attestation",
+    "https://se.moevm.info/doku.php/diplomants:start:slides_checklist_etu"
+]
+
+urls_5 = [
+    "https://se.moevm.info/doku.php/courses:ml",
+    "https://se.moevm.info/doku.php/courses:devops",
+    "https://se.moevm.info/doku.php/courses:pandas_r",
+    "https://se.moevm.info/doku.php/courses:data_analysis_and_interpretation:start",
+    "https://se.moevm.info/doku.php/courses:system_analysis_modeling_and_optimization:start",
+    "https://se.moevm.info/doku.php/courses:dev_ai",
+    "https://se.moevm.info/doku.php/courses:mse:start",
+    "https://se.moevm.info/doku.php/courses:artificial_neural_networks_masters",
+    "https://se.moevm.info/doku.php/courses:blockchain",
+    "https://se.moevm.info/doku.php/courses:reinforcement_learning",
+    "https://se.moevm.info/doku.php/courses:knowledge_representation_and_artificial_intelligence_systems:start",
+    "https://se.moevm.info/doku.php/diplomants:start:first_year_attestation",
+    "https://se.moevm.info/doku.php/diplomants:start:first_year_spring_attestation"
+]
+
+urls_6 = [
+    "https://se.moevm.info/doku.php/courses:spatial_ai",
+    "https://se.moevm.info/doku.php/courses:smart_data",
+    "https://se.moevm.info/doku.php/courses:knowledge_graphs",
+    "http://wiki.osll.ru/doku.php/courses:high_performance_computing:start",
+    "https://se.moevm.info/doku.php/courses:knowledge_representation_and_artificial_intelligence_systems:start",
+    "https://se.moevm.info/doku.php/courses:ros:start",
+    "https://se.moevm.info/doku.php/diplomants:start:calendar",
+    "https://se.moevm.info/doku.php/diplomants:start:diploma_attestation",
+    "https://se.moevm.info/doku.php/diplomants:start:slides_checklist_etu"
+]
+
+headers = {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0"
+}
+
+
+def get_html(url: str) -> str:
+    req = requests.get(url, headers=headers, verify=False)
+    return req.text
+
+
+def write_to_file(filename: str, src: str) -> None:
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(src)
+    file.close()
+
+
+def read_from_file(filename: str) -> str:
+    with open(filename, "r", encoding="utf-8") as file:
+        src = file.read()
+    file.close()
+    return src
+
+
+def edit_html_a_tags(src: str) -> str:
+    src.replace('<a href="/doku.php', '<a href="https://se.moevm.info/doku.php').replace('<a href="/lib',
+                                                                                         '<a href="https://se.moevm.info/lib')
+    return src
+
+
+def clear(filename):
+    with open(filename, "r", encoding="utf-8") as file:
+        src = file.read()
+    str_1 = src[:src.find("<!-- ********** HEADER ********** -->") + 1] + src[src.find(
+        "<!-- wikipage start -->"):src.find(
+        "<!-- wikipage stop -->") + 1] + src[src.find("<!-- /footer -->"):]
+    str_2 = str_1.replace("<<", '<')
+    if "<!-- TOC START -->" in str_2:
+        str_3 = str_2[:str_2.find("<!-- TOC START -->")] + str_2[
+                                                           str_2.find("<!-- TOC END -->") + len("<!-- TOC END -->"):]
+    else:
+        str_3 = str_2
+    str_4 = str_3.replace('"/doku.php', '"https://se.moevm.info/doku.php').replace('"/lib',
+                                                                                   '"https://se.moevm.info/lib')
+    with open(filename, "w", encoding="utf-8") as file:
+        file.write(str_4)
+
+
+def get_all_links_from_html(filename: str, step: int, csvfile: str):
+    src = read_from_file(filename)
+    soup = BeautifulSoup(src, "lxml")
+    all_links = soup.find_all("a")
+    number_of_htmls = len(all_links)
+    count = 0
+    m = []
+    for link in all_links:
+        try:
+            if not count:
+                mode = "w"
+            else:
+                mode = "a"
+
+            link_text_raw = link.text.strip()
+            link_url_raw = link.get("href").strip()
+            link_text = " ".join(link_text_raw.split())
+            link_url = " ".join(link_url_raw.split())
+            print(link_text)
+            count += 1
+            if count == 1:
+                os.mkdir(filename[:filename.find(".")])
+            if not step:
+                link_content = get_html(link_url)
+                write_to_file(filename[:filename.find(".")] + "/" + str(count) + ".html", link_content)
+
+            if count <= number_of_htmls:
+                link_content_name = filename[:filename.find(".")] + "/" + str(count) + ".html"
+                link_content = read_from_file(link_content_name)
+            else:
+                link_content_name = ""
+            with open(csvfile, mode=mode, encoding='utf-8') as w_file:
+                file_writer = csv.writer(w_file, delimiter=";", lineterminator="\r")
+                file_writer.writerow([link_text, link_url, link_content_name])
+            w_file.close()
+        except Exception as ex:
+            print(ex)
+
+
+def process(course_number: int, course_list: list):
+    for i in range(len(course_list)):
+        x = course_list[i]
+        src = get_html(x)
+        html_name = f"{course_number}_{i + 1}.html"
+        write_to_file(html_name, src)
+        clear(html_name)
+        get_all_links_from_html(html_name, 0, f"{course_number}_{i + 1}/links_{course_number}_{i + 1}.csv")
+
+
+def clear_links(course_number: int, course_list: list):
+    for i in range(len(course_list)):
+        with open(f"./{course_number}_{i + 1}/links_{course_number}_{i + 1}.csv", encoding='utf-8') as r_file:
+            file_reader = csv.reader(r_file, delimiter=";")
+            count = 0
+            for row in file_reader:
+                url = row[1]
+                count += 1
+                if count > 50:
+                    break
+                if "se.moevm" in url:
+                    clear(f"./{course_number}_{i + 1}/{count}.html")
+                    print(f"./{course_number}_{i + 1}/{count}.html")
+
+
+def main():
+    process(1, urls_1)
+    clear_links(1, urls_1)
+
+
+if __name__ == "__main__":
+    main()
